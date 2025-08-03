@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/complaint.dart';
-import '../models/tenant.dart';
 import 'auth_service.dart';
 
 class ComplaintService {

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tenant.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://localhost:8080/api'; // Java backend URL
+  static const String baseUrl = 'http://localhost:8080/builiding-maintenance'; // Java backend URL
   static const String tokenKey = 'auth_token';
   static const String tenantKey = 'tenant_data';
 
@@ -12,10 +12,10 @@ class AuthService {
   Future<Tenant?> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/tenant/login'),
+        Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'email': email,
+          'username': email,
           'password': password,
         }),
       );

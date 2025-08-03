@@ -70,12 +70,12 @@ class TenantComplaintApp extends StatelessWidget {
               vertical: 12,
             ),
           ),
-          cardTheme: CardTheme(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+            cardTheme: CardThemeData(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-          ),
         ),
         routes: {
           '/': (context) => const SplashScreen(),
