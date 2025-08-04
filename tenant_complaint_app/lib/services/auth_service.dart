@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tenant.dart';
+import 'interfaces/i_auth_service.dart';
+import '../config/app_config.dart';
 
-class AuthService {
-  static const String baseUrl = 'http://192.168.1.37:8080/building-maintenance'; // Java backend URL
+class AuthService implements IAuthService {
+  static const String baseUrl = AppConfig.baseUrl;
   static const String tokenKey = 'auth_token';
   static const String tenantKey = 'tenant_data';
 

@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import '../models/tenant.dart';
-import '../services/auth_service.dart';
+import '../services/interfaces/i_auth_service.dart';
+import '../services/service_factory.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final IAuthService _authService = ServiceFactory.createAuthService();
   
   Tenant? _currentTenant;
   bool _isLoading = false;

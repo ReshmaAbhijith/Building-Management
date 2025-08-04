@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/complaint.dart';
 import 'auth_service.dart';
+import 'interfaces/i_complaint_service.dart';
+import '../config/app_config.dart';
 
-class ComplaintService {
-  static const String baseUrl = 'http://192.168.1.37:8080/building-maintenance';
+class ComplaintService implements IComplaintService {
+  static const String baseUrl = AppConfig.baseUrl;
 
   final AuthService _authService = AuthService();
 

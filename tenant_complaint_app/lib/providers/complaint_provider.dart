@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import '../models/complaint.dart';
-import '../services/complaint_service.dart';
+import '../services/interfaces/i_complaint_service.dart';
+import '../services/service_factory.dart';
 
 class ComplaintProvider with ChangeNotifier {
-  final ComplaintService _complaintService = ComplaintService();
+  final IComplaintService _complaintService = ServiceFactory.createComplaintService();
   
   List<Complaint> _complaints = [];
   List<String> _categories = [];
