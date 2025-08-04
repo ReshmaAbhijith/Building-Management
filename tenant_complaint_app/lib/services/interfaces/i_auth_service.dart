@@ -6,4 +6,9 @@ abstract class IAuthService {
   Future<String?> getToken();
   Future<Tenant?> getCurrentTenant();
   Future<bool> isLoggedIn();
+  
+  // Additional methods from existing service
+  Future<bool> refreshToken();
+  Future<Tenant?> updateProfile(Map<String, dynamic> updates);
+  Future<bool> changePassword(String currentPassword, String newPassword);
 }

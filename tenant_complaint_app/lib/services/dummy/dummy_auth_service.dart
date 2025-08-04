@@ -72,4 +72,76 @@ class DummyAuthService implements IAuthService {
     print('🎭 [DUMMY] Is logged in: $isLoggedIn');
     return isLoggedIn;
   }
+
+  @override
+  Future<bool> refreshToken() async {
+    // Simulate token refresh
+    await Future.delayed(Duration(milliseconds: AppConfig.demoNetworkDelayMs));
+    
+    final currentToken = await getToken();
+    if (currentToken != null) {
+      // Generate new dummy token
+      final newToken = 'dummy_token_${DateTime.now().millisecondsSinceEpoch}';
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(tokenKey, newToken);
+      print('🎭 [DUMMY] Token refreshed successfully');
+      return true;
+    }
+    
+    print('🎭 [DUMMY] Token refresh failed - no current token');
+    return false;
+  }
+
+  @override
+  Future<Tenant?> updateProfile(Map<String, dynamic> updates) async {
+    // Simulate network delay
+    await Future.delayed(Duration(milliseconds: AppConfig.demoNetworkDelayMs));
+    
+    final currentTenant = await getCurrentTenant();
+    if (currentTenant == null) {
+      throw Exception('Not authenticated');
+    }
+    
+    // Create updated tenant (in real app, this would merge with server data)
+    final updatedTenant = Tenant(
+      id: currentTenant.id,
+      fullName: updates['fullName'] ?? currentTenant.fullName,
+      email: updates['email'] ?? currentTenant.email,
+      phone: updates['phone'] ?? currentTenant.phone,
+      buildingId: currentTenant.buildingId,
+      buildingName: currentTenant.buildingName,
+      apartmentNo: currentTenant.apartmentNo,
+      floor: currentTenant.floor,
+      rentAmount: currentTenant.rentAmount,
+      securityDeposit: currentTenant.securityDeposit,
+      leaseStartDate: currentTenant.leaseStartDate,
+      leaseEndDate: currentTenant.leaseEndDate,
+      isActive: currentTenant.isActive,
+      emergencyContact: currentTenant.emergencyContact,
+      createdAt: currentTenant.createdAt,
+      updatedAt: DateTime.now(),
+    );
+    
+    // Store updated tenant
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(tenantKey, jsonEncode(updatedTenant.toJson()));
+    
+    print('🎭 [DUMMY] Profile updated successfully');
+    return updatedTenant;
+  }
+
+  @override
+  Future<bool> changePassword(String currentPassword, String newPassword) async {
+    // Simulate network delay
+    await Future.delayed(Duration(milliseconds: AppConfig.demoNetworkDelayMs));
+    
+    // Simple validation for demo
+    if (currentPassword == AppConfig.demoPassword) {
+      print('🎭 [DUMMY] Password changed successfully');
+      return true;
+    } else {
+      print('🎭 [DUMMY] Password change failed - incorrect current password');
+      return false;
+    }
+  }
 }
