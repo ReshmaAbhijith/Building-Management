@@ -1,7 +1,7 @@
 class Tenant {
 
   final String id;
-  final String name;
+  final String fullName;
   final String email;
   final String phone;
   final String buildingId;
@@ -19,7 +19,7 @@ class Tenant {
 
   Tenant({
     required this.id,
-    required this.name,
+    required this.fullName,
     required this.email,
     required this.phone,
     required this.buildingId,
@@ -38,33 +38,31 @@ class Tenant {
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
-      buildingId: json['buildingId'],
-      buildingName: json['buildingName'],
-      apartmentNo: json['apartmentNo'],
-      floor: json['floor'],
-      rentAmount: json['rentAmount'].toDouble(),
-      securityDeposit: json['securityDeposit']?.toDouble(),
-      leaseStartDate: DateTime.parse(json['leaseStartDate']),
-      leaseEndDate: json['leaseEndDate'] != null 
-          ? DateTime.parse(json['leaseEndDate']) 
-          : null,
-      isActive: json['isActive'],
+      id: json['id'] ?? '',
+      fullName: json['fullName'] ?? 'Abhijith Nair',
+      email: json['userName'] ?? 'abhijith.nair@gmail.com',
+      phone: json['phone'] ?? '0554383855',
+      buildingId: json['buildingId'] ?? '',
+      buildingName: json['buildingName'] ?? 'Wasayf',
+      apartmentNo: json['apartmentNo'] ?? '204',
+      floor: json['floor'] ?? 2,
+      rentAmount: json['rentAmount']?? 0,
+      securityDeposit: json['securityDeposit'] ?? 0,
+      leaseStartDate: DateTime.now(),
+      leaseEndDate: DateTime.now(),
+      isActive: true,
       emergencyContact: json['emergencyContact'] != null
           ? EmergencyContact.fromJson(json['emergencyContact'])
           : null,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'name': fullName,
       'email': email,
       'phone': phone,
       'buildingId': buildingId,

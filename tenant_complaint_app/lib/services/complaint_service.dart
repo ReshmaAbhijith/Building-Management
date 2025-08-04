@@ -5,19 +5,19 @@ import '../models/complaint.dart';
 import 'auth_service.dart';
 
 class ComplaintService {
-  static const String baseUrl = 'http://localhost:8080/api';
+  static const String baseUrl = 'http://192.168.1.37:8080/building-maintenance';
+
   final AuthService _authService = AuthService();
 
-  // Get headers with authentication
   Future<Map<String, String>> _getHeaders() async {
     final token = await _authService.getToken();
+    print('🔑 [Auth] Fetched token: $token'); // 💬
     return {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
   }
 
-  // Get tenant's complaints
   Future<List<Complaint>> getTenantComplaints({
     int page = 0,
     int size = 10,
@@ -26,43 +26,53 @@ class ComplaintService {
   }) async {
     try {
       final tenant = await _authService.getCurrentTenant();
+      print('👤 [Tenant] Loaded tenant: ${tenant?.id}'); // 💬
       if (tenant == null) throw Exception('Not authenticated');
 
       final queryParams = {
         'page': page.toString(),
         'size': size.toString(),
-        'tenantId': tenant.id,
+        'tenantId': tenant.id.toString(),
         if (status != null) 'status': status,
         if (priority != null) 'priority': priority,
       };
 
-      final uri = Uri.parse('$baseUrl/complaints').replace(
+      final uri = Uri.parse('$baseUrl/api/issues').replace(
         queryParameters: queryParams,
       );
+      print('🌐 [GET] $uri'); // 💬
 
       final response = await http.get(uri, headers: await _getHeaders());
+
+      print('📥 [Response ${response.statusCode}] ${response.body}'); // 💬
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final complaints = (data['content'] as List)
             .map((json) => Complaint.fromJson(json))
             .toList();
+        print('✅ [Parsed] ${complaints.length} complaints loaded'); // 💬
         return complaints;
       } else {
         throw Exception('Failed to load complaints: ${response.body}');
       }
     } catch (e) {
+      print('❌ [Error] getTenantComplaints: $e'); // 💬
       throw Exception('Error loading complaints: $e');
     }
   }
 
-  // Get complaint by ID
   Future<Complaint?> getComplaintById(String id) async {
     try {
+      final uri = Uri.parse('$baseUrl/issues/$id');
+      print('🌐 [GET] $uri'); // 💬
+
       final response = await http.get(
-        Uri.parse('$baseUrl/complaints/$id'),
+        uri,
         headers: await _getHeaders(),
       );
+
+      print('📥 [Response ${response.statusCode}] ${response.body}'); // 💬
 
       if (response.statusCode == 200) {
         return Complaint.fromJson(jsonDecode(response.body));
@@ -72,14 +82,15 @@ class ComplaintService {
         throw Exception('Failed to load complaint: ${response.body}');
       }
     } catch (e) {
+      print('❌ [Error] getComplaintById: $e'); // 💬
       throw Exception('Error loading complaint: $e');
     }
   }
 
-  // Create new complaint
   Future<Complaint> createComplaint(CreateComplaintRequest request) async {
     try {
       final tenant = await _authService.getCurrentTenant();
+      print('👤 [Tenant] Loaded for creation: ${tenant?.id}'); // 💬
       if (tenant == null) throw Exception('Not authenticated');
 
       final complaintData = {
@@ -89,11 +100,15 @@ class ComplaintService {
         'apartmentNo': tenant.apartmentNo,
       };
 
+      print('📝 [POST] Complaint data: $complaintData'); // 💬
+
       final response = await http.post(
         Uri.parse('$baseUrl/complaints'),
         headers: await _getHeaders(),
         body: jsonEncode(complaintData),
       );
+
+      print('📥 [Response ${response.statusCode}] ${response.body}'); // 💬
 
       if (response.statusCode == 201) {
         return Complaint.fromJson(jsonDecode(response.body));
@@ -101,15 +116,17 @@ class ComplaintService {
         throw Exception('Failed to create complaint: ${response.body}');
       }
     } catch (e) {
+      print('❌ [Error] createComplaint: $e'); // 💬
       throw Exception('Error creating complaint: $e');
     }
   }
 
-  // Upload image for complaint
   Future<String> uploadImage(File imageFile) async {
     try {
       final token = await _authService.getToken();
       if (token == null) throw Exception('Not authenticated');
+
+      print('🖼️ [Upload] File path: ${imageFile.path}'); // 💬
 
       final request = http.MultipartRequest(
         'POST',
@@ -124,6 +141,8 @@ class ComplaintService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
+      print('📥 [Upload Response ${response.statusCode}] ${response.body}'); // 💬
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data['imageUrl'];
@@ -131,21 +150,25 @@ class ComplaintService {
         throw Exception('Failed to upload image: ${response.body}');
       }
     } catch (e) {
+      print('❌ [Error] uploadImage: $e'); // 💬
       throw Exception('Error uploading image: $e');
     }
   }
 
-  // Add note to complaint
   Future<ComplaintNote> addNote(String complaintId, String content) async {
     try {
+      print('📝 [Note] Adding note to complaint $complaintId'); // 💬
+
       final response = await http.post(
         Uri.parse('$baseUrl/complaints/$complaintId/notes'),
         headers: await _getHeaders(),
         body: jsonEncode({
           'content': content,
-          'isInternal': false, // Tenant notes are not internal
+          'isInternal': false,
         }),
       );
+
+      print('📥 [Response ${response.statusCode}] ${response.body}'); // 💬
 
       if (response.statusCode == 201) {
         return ComplaintNote.fromJson(jsonDecode(response.body));
@@ -153,11 +176,11 @@ class ComplaintService {
         throw Exception('Failed to add note: ${response.body}');
       }
     } catch (e) {
+      print('❌ [Error] addNote: $e'); // 💬
       throw Exception('Error adding note: $e');
     }
   }
 
-  // Get complaint categories
   Future<List<String>> getComplaintCategories() async {
     try {
       final response = await http.get(
@@ -165,49 +188,45 @@ class ComplaintService {
         headers: await _getHeaders(),
       );
 
+      print('📥 [Category Response ${response.statusCode}] ${response.body}'); // 💬
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<String>.from(data['categories']);
       } else {
-        // Return default categories if API fails
-        return [
-          'Plumbing',
-          'Electrical',
-          'HVAC',
-          'Appliances',
-          'Pest Control',
-          'Maintenance',
-          'Security',
-          'Noise',
-          'Other',
-        ];
+        print('⚠️ [Category Fallback] Using defaults'); // 💬
+        return _defaultCategories();
       }
     } catch (e) {
-      // Return default categories if error occurs
-      return [
-        'Plumbing',
-        'Electrical',
-        'HVAC',
-        'Appliances',
-        'Pest Control',
-        'Maintenance',
-        'Security',
-        'Noise',
-        'Other',
-      ];
+      print('❌ [Error] getComplaintCategories: $e'); // 💬
+      return _defaultCategories();
     }
   }
 
-  // Get complaint statistics for tenant
+  List<String> _defaultCategories() => [
+    'Plumbing',
+    'Electrical',
+    'HVAC',
+    'Appliances',
+    'Pest Control',
+    'Maintenance',
+    'Security',
+    'Noise',
+    'Other',
+  ];
+
   Future<Map<String, int>> getComplaintStats() async {
     try {
       final tenant = await _authService.getCurrentTenant();
       if (tenant == null) throw Exception('Not authenticated');
 
-      final response = await http.get(
-        Uri.parse('$baseUrl/complaints/stats/tenant/${tenant.id}'),
-        headers: await _getHeaders(),
-      );
+      final uri =
+      Uri.parse('$baseUrl/complaints/stats/tenant/${tenant.id}');
+      print('📊 [Stats] Fetching stats for tenant: ${tenant.id}'); // 💬
+
+      final response = await http.get(uri, headers: await _getHeaders());
+
+      print('📥 [Stats Response ${response.statusCode}] ${response.body}'); // 💬
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -228,6 +247,7 @@ class ComplaintService {
         };
       }
     } catch (e) {
+      print('❌ [Error] getComplaintStats: $e'); // 💬
       return {
         'total': 0,
         'open': 0,
@@ -238,20 +258,23 @@ class ComplaintService {
     }
   }
 
-  // Search complaints
   Future<List<Complaint>> searchComplaints(String query) async {
     try {
       final tenant = await _authService.getCurrentTenant();
       if (tenant == null) throw Exception('Not authenticated');
 
-      final response = await http.get(
-        Uri.parse('$baseUrl/complaints/search')
-            .replace(queryParameters: {
+      final uri = Uri.parse('$baseUrl/complaints/search').replace(
+        queryParameters: {
           'q': query,
           'tenantId': tenant.id,
-        }),
-        headers: await _getHeaders(),
+        },
       );
+
+      print('🔎 [Search] URI: $uri'); // 💬
+
+      final response = await http.get(uri, headers: await _getHeaders());
+
+      print('📥 [Search Response ${response.statusCode}] ${response.body}'); // 💬
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -262,6 +285,7 @@ class ComplaintService {
         throw Exception('Failed to search complaints: ${response.body}');
       }
     } catch (e) {
+      print('❌ [Error] searchComplaints: $e'); // 💬
       throw Exception('Error searching complaints: $e');
     }
   }

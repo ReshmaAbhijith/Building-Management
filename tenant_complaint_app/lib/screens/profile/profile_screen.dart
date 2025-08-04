@@ -45,7 +45,7 @@ class ProfileScreen extends StatelessWidget {
                           radius: 50,
                           backgroundColor: AppColors.primary,
                           child: Text(
-                            tenant.name.substring(0, 1).toUpperCase(),
+                            tenant.fullName.substring(0, 1).toUpperCase(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 36,
@@ -55,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          tenant.name,
+                          tenant.fullName,
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

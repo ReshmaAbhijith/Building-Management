@@ -114,7 +114,7 @@ class DashboardTab extends StatelessWidget {
                             radius: 30,
                             backgroundColor: AppColors.primary,
                             child: Text(
-                              tenant?.name.substring(0, 1).toUpperCase() ?? 'T',
+                              tenant?.fullName.substring(0, 1).toUpperCase() ?? 'T',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -134,7 +134,7 @@ class DashboardTab extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  tenant?.name ?? 'Tenant',
+                                  tenant?.fullName ?? 'Tenant',
                                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),

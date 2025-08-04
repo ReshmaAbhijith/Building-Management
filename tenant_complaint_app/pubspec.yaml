@@ -35,7 +35,7 @@ dependencies:
   uuid: ^4.1.0
   
   # Notifications
-  flutter_local_notifications: ^16.1.0
+  flutter_local_notifications: 17.2.1
   
   # Form Validation
   form_validator: ^2.1.1

@@ -4,13 +4,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tenant.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://localhost:8080/builiding-maintenance'; // Java backend URL
+  static const String baseUrl = 'http://192.168.1.37:8080/building-maintenance'; // Java backend URL
   static const String tokenKey = 'auth_token';
   static const String tenantKey = 'tenant_data';
 
   // Login tenant
   Future<Tenant?> login(String email, String password) async {
     try {
+      final url = Uri.parse('$baseUrl/auth/login');
+      print('Making POST request to: $url');
+      print('Request headers: {"Content-Type": "application/json"}');
+      print('Request body: ${jsonEncode({
+        'username': email,
+        'password': password,
+      })}');
+
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
@@ -19,7 +27,9 @@ class AuthService {
           'password': password,
         }),
       );
-
+print(response);
+print(response.statusCode);
+print(response.body);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['token'];
@@ -32,9 +42,11 @@ class AuthService {
 
         return tenant;
       } else {
+        print('Login error:'); // Add this
         throw Exception('Login failed: ${response.body}');
       }
     } catch (e) {
+      print('Login error: $e'); // Add this
       throw Exception('Login error: $e');
     }
   }
