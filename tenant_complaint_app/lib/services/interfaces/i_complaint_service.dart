@@ -11,8 +11,8 @@ abstract class IComplaintService {
   
   Future<Complaint> createComplaint(CreateComplaintRequest request);
   Future<Complaint?> getComplaintById(String id);
-  Future<void> addComplaintNote(String complaintId, String note);
-  Future<List<String>> uploadImages(List<String> imagePaths);
+  /*Future<void> addComplaintNote(String complaintId, String note);
+  Future<List<String>> uploadImages(List<String> imagePaths);*/
   
   // Additional methods from existing service
   Future<String> uploadImage(File imageFile);
